@@ -14,6 +14,12 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     environment: Testing
+    env:
+      APP_ENV: testing
+      DB_CONNECTION: sqlite
+      DB_DATABASE: database/database.sqlite
+      CACHE_DRIVER: array
+      QUEUE_CONNECTION: sync
 
     steps:
       - name: Checkout
@@ -24,6 +30,7 @@ jobs:
         with:
           php-version: 8.4
           tools: composer:v2
+          extensions: pdo_sqlite, mbstring, bcmath, gd, sqlite
           coverage: xdebug
 
       - name: Setup Node
@@ -38,7 +45,7 @@ jobs:
       - name: Add Flux Credentials Loaded From ENV
         run: composer config http-basic.composer.fluxui.dev "${{ secrets.FLUX_USERNAME }}" "${{ secrets.FLUX_LICENSE_KEY }}"
 
-      - name: Install Dependencies
+      - name: Install PHP Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Copy Environment File
@@ -49,6 +56,14 @@ jobs:
 
       - name: Build Assets
         run: npm run build
+
+      - name: Create SQLite Database
+        run: |
+          mkdir -p database
+          touch database/database.sqlite
+
+      - name: Run Migrations
+        run: php artisan migrate
 
       - name: Run Tests
         run: ./vendor/bin/pest
