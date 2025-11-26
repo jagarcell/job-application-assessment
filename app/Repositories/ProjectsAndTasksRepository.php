@@ -61,9 +61,12 @@ class ProjectsAndTasksRepository
      * @param int $projectId
      * @return Collection
      */
-    public function getTasksInProject(int $projectId)
+    public function getTasksInProject(int $projectId): Collection
     {
         // Logic to retrieve tasks for a specific project
+        if (!$projectId) {
+            return new Collection();
+        }
         return Task::where('project_id', $projectId)
             ->orderBy('priority', 'asc')
             ->get();

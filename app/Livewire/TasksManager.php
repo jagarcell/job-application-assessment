@@ -80,7 +80,7 @@ class TasksManager extends Component
      * 
      * @return void
      */
-    public function mount()
+    public function mount(): void
     {
         // Initialization code can go here
         $this->projects = $this->projectsAndTasksRepository->getProjects();
@@ -107,12 +107,7 @@ class TasksManager extends Component
     public function getProjectTasksProperty(): Collection
     {
         if ($this->selectedProjectId) {
-            try {
-                return $this->projectsAndTasksRepository->getTasksInProject($this->selectedProjectId);
-            } catch (\Exception $e) {
-                Log::error("Failed to load tasks for project ID {$this->selectedProjectId}: " . $e->getMessage());
-                return new Collection();
-            }
+            return $this->projectsAndTasksRepository->getTasksInProject($this->selectedProjectId);
         }
         return new Collection();
     }
