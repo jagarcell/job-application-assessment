@@ -12,3 +12,8 @@ it('tests if Livewire TasksManager component can render', function () {
     Livewire::test(TasksManager::class)
         ->assertStatus(200);
 });
+
+it('tests if tasksList is available in the component\'s blade', function () {
+    Livewire::test(TasksManager::class)
+        ->assertSeeHtml('id="tasksList"');
+});
