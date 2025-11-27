@@ -163,14 +163,15 @@ class TasksManager extends Component
      */
     public function editTask(int $taskId)
     {
-        if ($this->projectsAndTasksRepository->editTask($taskId, ['name' => $this->taskName])) {
-            // Task edited successfully
-            $this->reset(['taskName', 'editingTaskId']);
+        $taskName = $this->projectsAndTasksRepository->editTask($taskId);
+        if ($taskName !== '') {
+            $this->taskName = $taskName;
             $this->editingTaskId = $taskId;
         } else {
             // Handle the failure case if needed
             Log::error("Failed to edit task with ID {$taskId}");
             session()->flash('error.task', __('tasks.edit_failed'));
+            $this->reset(['taskName', 'editingTaskId']);
         }
     }
 

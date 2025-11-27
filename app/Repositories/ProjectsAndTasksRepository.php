@@ -113,18 +113,17 @@ class ProjectsAndTasksRepository
      * editTask
      * @param int $taskId
      * @param array $data
-     * @return bool
+     * @return string
      */
-    public function editTask(int $taskId, array $data): bool
+    public function editTask(int $taskId): string
     {
         // Logic to edit a task
         try {
             $task = Task::findOrFail($taskId);
-            $task->update($data);
-            return true;
+            return $task->name;
         } catch (\Exception $e) {
-            \Log::error("Failed to edit task ID {$taskId}: " . $e->getMessage());
-            return false;
+            Log::error("Failed to edit task ID {$taskId}: " . $e->getMessage());
+            return '';
         }
     }
 
