@@ -66,7 +66,7 @@ it('tests if updatedSelectedProjectId updates reset taskName and newProjectName'
         ->assertSet('newProjectName', '');
 });
 
-it('updates a task and resets fields on success', function () {
+it('if updateTask resets fields on success', function () {
     // Fake tasks to return from the repository
     $fakeProjects = new Collection();
 
@@ -92,4 +92,32 @@ it('updates a task and resets fields on success', function () {
         ->call('updateTask')
         ->assertSet('taskName', '')
         ->assertSet('editingTaskId', null);
+});
+
+it('test if updateTask does not reset fields on failure', function () {
+    // Fake tasks to return from the repository
+    $fakeProjects = new Collection();
+
+    // Mock the repository
+    $repo = Mockery::mock(ProjectsAndTasksRepository::class);
+    $repo->shouldReceive('getProjects')
+        ->andReturn($fakeProjects);
+
+        // Bind the mock to the container so Livewire receives it
+    app()->instance(ProjectsAndTasksRepository::class, $repo);
+
+    $repo->shouldReceive('updateTask')
+        ->once()
+        ->with(10, ['name' => 'Updated Task Name'])
+        ->andReturn(false);
+
+    // Bind mock into container
+    app()->instance(ProjectsAndTasksRepository::class, $repo);
+
+    Livewire::test(TasksManager::class)
+        ->set('editingTaskId', 10)
+        ->set('taskName', 'Updated Task Name')
+        ->call('updateTask')
+        ->assertSet('taskName', 'Updated Task Name')
+        ->assertSet('editingTaskId', 10);
 });
