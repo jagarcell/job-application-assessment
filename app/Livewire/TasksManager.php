@@ -126,7 +126,7 @@ class TasksManager extends Component
         } else {
             // Handle the failure case if needed
             Log::error("Failed to update task with ID {$this->editingTaskId}");
-            session()->flash('error.task', 'Failed to update the task. Please try again.');
+            session()->flash('error.task', __('tasks.update_failed'));
         }
     }
 
@@ -139,7 +139,7 @@ class TasksManager extends Component
     public function createTask()
     {
         if (empty($this->taskName)) {
-            session()->flash('error.task', 'Task name cannot be empty.');
+            session()->flash('error.task', __('tasks.name_empty'));
             return;
         }
         $task = $this->projectsAndTasksRepository->createTask([
@@ -148,7 +148,7 @@ class TasksManager extends Component
         ]);
         if (!$task) {
             Log::error("Failed to create task in project ID {$this->selectedProjectId}");
-            session()->flash('error.task', 'Failed to create the task. Please try again.');
+            session()->flash('error.task', __('tasks.create_failed'));
             return;
         }
         $this->reset('taskName');
@@ -172,7 +172,7 @@ class TasksManager extends Component
         } else {
             // Handle the failure case if needed
             Log::error("Failed to edit task with ID {$taskId}");
-            session()->flash('error.task', 'Failed to edit the task. Please try again.');
+            session()->flash('error.task', __('tasks.edit_failed'));
             return;
         }
     }
@@ -194,7 +194,7 @@ class TasksManager extends Component
         } else {
             // Handle the failure case if needed
             Log::error("Failed to delete task with ID {$taskId}");
-            session()->flash('error.task', 'Failed to delete the task. Please try again.');
+            session()->flash('error.task', __('tasks.delete_failed'));
             return;
         }
     }
@@ -229,7 +229,7 @@ class TasksManager extends Component
     public function createProject()
     {
         if (empty($this->newProjectName)) {
-            session()->flash('error.project', 'Project name cannot be empty.');
+            session()->flash('error.project', __('projects.name_empty'));
             return;
         }
         $newProject = $this->projectsAndTasksRepository->createProject([
@@ -237,7 +237,7 @@ class TasksManager extends Component
         ]);
         if ($newProject === null) {
             Log::error("Failed to create new project with name {$this->newProjectName}");
-            session()->flash('error.project', 'Failed to create the project. Please try again.');
+            session()->flash('error.project', __('projects.create_failed'));
             return;
         }
         $this->projects->push($newProject);
@@ -257,7 +257,7 @@ class TasksManager extends Component
     {
         if ($this->projectsAndTasksRepository->deleteProject($projectId) === false) {
             Log::error("Failed to delete project with ID {$projectId}");
-            session()->flash('error.project', 'Failed to delete the project. Please try again.');
+            session()->flash('error.project', __('projects.delete_failed'));
             return;
         }
         $this->projects = $this->projectsAndTasksRepository->getProjects();
