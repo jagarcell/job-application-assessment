@@ -202,3 +202,79 @@ it('tests if createTask does not reset taskName on failure and send error messag
         ->call('createTask')
         ->assertSet('taskName', 'New Task');
 });
+
+it('tests if editTask sets editingTaskId and taskName on success', function () {
+    // Fake tasks to return from the repository
+    $fakeProjects = new Collection();
+    $fakeProjects->push(Project::create(['name' => 'Fake Project 1']));
+
+    $fakeTasks = new Collection();
+    $fakeTasks->push(Task::create([
+        'id' => 5,
+        'name' => 'Fake Task 2',
+        'project_id' => 1,
+        'priority' => 2,
+        ])
+    );
+
+    // Mock the repository
+    $repo = Mockery::mock(ProjectsAndTasksRepository::class);
+
+    $repo->shouldReceive('getProjects')
+        ->andReturn($fakeProjects);
+
+    $repo->shouldReceive('getTasksInProject')
+        ->with(1)
+        ->andReturn($fakeTasks)
+        ->byDefault();
+
+    $repo->shouldReceive('editTask')
+        ->with(5)
+        ->andReturn('Fake Task 2');
+
+    // Bind mock into container
+    app()->instance(ProjectsAndTasksRepository::class, $repo);
+
+    Livewire::test(TasksManager::class, ['selectedProjectId' => 1, 'editingTaskId' => null, 'taskName' => ''])
+        ->call('editTask', 5)
+        ->assertSet('editingTaskId', 5)
+        ->assertSet('taskName', 'Fake Task 2');
+});
+
+it('tests if editTask resets editingTaskId and taskName on failure and shows error message', function () {
+    // Fake tasks to return from the repository
+    $fakeProjects = new Collection();
+    $fakeProjects->push(Project::create(['name' => 'Fake Project 1']));
+
+    $fakeTasks = new Collection();
+    $fakeTasks->push(Task::create([
+        'id' => 5,
+        'name' => 'Fake Task 2',
+        'project_id' => 1,
+        'priority' => 2,
+        ])
+    );
+
+    // Mock the repository
+    $repo = Mockery::mock(ProjectsAndTasksRepository::class);
+
+    $repo->shouldReceive('getProjects')
+        ->andReturn($fakeProjects);
+
+    $repo->shouldReceive('getTasksInProject')
+        ->with(1)
+        ->andReturn($fakeTasks)
+        ->byDefault();
+
+    $repo->shouldReceive('editTask')
+        ->with(5)
+        ->andReturn('');
+
+    // Bind mock into container
+    app()->instance(ProjectsAndTasksRepository::class, $repo);
+
+    Livewire::test(TasksManager::class, ['selectedProjectId' => 1, 'editingTaskId' => null, 'taskName' => ''])
+        ->call('editTask', 5)
+        ->assertSet('editingTaskId', null)
+        ->assertSet('taskName', '');
+});
