@@ -167,12 +167,10 @@ class TasksManager extends Component
             // Task edited successfully
             $this->reset(['taskName', 'editingTaskId']);
             $this->editingTaskId = $taskId;
-            return;
         } else {
             // Handle the failure case if needed
             Log::error("Failed to edit task with ID {$taskId}");
             session()->flash('error.task', __('tasks.edit_failed'));
-            return;
         }
     }
 
