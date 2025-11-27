@@ -113,24 +113,6 @@ class TasksManager extends Component
     }
 
     /**
-     * updateTask
-     * handle the click event on Update button.
-     * 
-     * @return void
-     */
-    public function updateTask()
-    {
-        if ($this->projectsAndTasksRepository->updateTask($this->editingTaskId, ['name' => $this->taskName])) {
-            // Task updated successfully
-            $this->reset(['taskName', 'editingTaskId']);
-        } else {
-            // Handle the failure case if needed
-            Log::error("Failed to update task with ID {$this->editingTaskId}");
-            session()->flash('error.task', __('tasks.update_failed'));
-        }
-    }
-
-    /**
      * createTask
      * handle the click event on Add button.
      * 
@@ -175,6 +157,24 @@ class TasksManager extends Component
         }
     }
 
+    /**
+     * updateTask
+     * handle the click event on Update button.
+     * 
+     * @return void
+     */
+    public function updateTask()
+    {
+        if ($this->projectsAndTasksRepository->updateTask($this->editingTaskId, ['name' => $this->taskName])) {
+            // Task updated successfully
+            $this->reset(['taskName', 'editingTaskId']);
+        } else {
+            // Handle the failure case if needed
+            Log::error("Failed to update task with ID {$this->editingTaskId}");
+            session()->flash('error.task', __('tasks.update_failed'));
+        }
+    }
+    
     /**
      * deleteTask 
      * handle the click event on Delete button.
