@@ -152,7 +152,6 @@ class TasksManager extends Component
             return;
         }
         $this->reset('taskName');
-        $this->render();
     }
 
     /**
