@@ -50,36 +50,36 @@
             <span>Timestamps</span>
             <span class="text-right">Actions</span>
         </div>
-
-        {{-- Task list --}}
-        <ul id="tasksList" class="space-y-2 mt-3">
-            @foreach ($this->projectTasks as $task)
-                <li data-taskid="{{ $task->id }}" class="p-3 bg-gray-100 border rounded cursor-move">
-                    <div class="grid grid-cols-4 items-center gap-4">
-
-                        {{-- Priority --}}
-                        <span>{{ $task->priority }}.</span>
-
-                        {{-- Task name --}}
-                        <span>{{ $task->name }}</span>
-
-                        {{-- Timestamps --}}
-                        <span>
-                            <div>Created: {{ $task->created_at->format('Y-m-d H:i:s') }}</div>
-                            <div>Updated: {{ $task->updated_at->format('Y-m-d H:i:s') }}</div>
-                        </span>
-
-                        {{-- Buttons --}}
-                        <div class="flex justify-end gap-3">
-                            <button wire:click="editTask({{ $task->id }})" class="text-blue-600">Edit</button>
-                            <button wire:click="deleteTask({{ $task->id }})" class="text-red-600">Delete</button>
-                        </div>
-
-                    </div>
-                </li>
-            @endforeach
-        </ul>
     @endif
+
+    {{-- Task list --}}
+    <ul id="tasksList" class="space-y-2 mt-3">
+        @foreach ($this->projectTasks as $task)
+            <li data-taskid="{{ $task->id }}" class="p-3 bg-gray-100 border rounded cursor-move">
+                <div class="grid grid-cols-4 items-center gap-4">
+
+                    {{-- Priority --}}
+                    <span>{{ $task->priority }}.</span>
+
+                    {{-- Task name --}}
+                    <span>{{ $task->name }}</span>
+
+                    {{-- Timestamps --}}
+                    <span>
+                        <div>Created: {{ $task->created_at->format('Y-m-d H:i:s') }}</div>
+                        <div>Updated: {{ $task->updated_at->format('Y-m-d H:i:s') }}</div>
+                    </span>
+
+                    {{-- Buttons --}}
+                    <div class="flex justify-end gap-3">
+                        <button wire:click="editTask({{ $task->id }})" class="text-blue-600">Edit</button>
+                        <button wire:click="deleteTask({{ $task->id }})" class="text-red-600">Delete</button>
+                    </div>
+
+                </div>
+            </li>
+        @endforeach
+    </ul>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
