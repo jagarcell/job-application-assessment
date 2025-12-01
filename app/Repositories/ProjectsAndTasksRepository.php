@@ -31,7 +31,7 @@ class ProjectsAndTasksRepository
         try {
             return Project::create($data);
         } catch (\Exception $e) {
-            \Log::error("Failed to create project: " . $e->getMessage());
+            Log::error("Failed to create project: " . $e->getMessage());
             return null;
         }
     }
@@ -158,8 +158,18 @@ class ProjectsAndTasksRepository
         try {
             // Reorder task priorities using a MySQL user-defined variable
             // This is more efficient thank sticking to Eloquent for this operation
-            DB::statement('SET @rank := 0;');
-            DB::statement('UPDATE tasks SET priority = (@rank := @rank + 1), updated_at = NOW() WHERE project_id = ? ORDER BY priority;', [$projectId]);
+            $now = now();
+            DB::statement("
+                WITH ranked AS (
+                    SELECT id, ROW_NUMBER() OVER (ORDER BY priority) AS new_priority
+                    FROM tasks
+                    WHERE project_id = ?
+                )
+                UPDATE tasks
+                SET priority = (SELECT new_priority FROM ranked WHERE ranked.id = tasks.id),
+                    updated_at = ?
+                WHERE project_id = ?;
+            ", [$projectId, $now, $projectId]);
 
             // We could have done something like this with Eloquent, but it would be less efficient leading to N + 1 queries:
 
