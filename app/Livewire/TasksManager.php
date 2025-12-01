@@ -129,7 +129,6 @@ class TasksManager extends Component
             'project_id' => $this->selectedProjectId
         ]);
         if (!$task) {
-            Log::error("Failed to create task in project ID {$this->selectedProjectId}");
             session()->flash('error.task', __('tasks.create_failed'));
             return;
         }
@@ -151,7 +150,6 @@ class TasksManager extends Component
             $this->editingTaskId = $taskId;
         } else {
             // Handle the failure case if needed
-            Log::error("Failed to edit task with ID {$taskId}");
             session()->flash('error.task', __('tasks.edit_failed'));
             $this->reset(['taskName', 'editingTaskId']);
         }
@@ -170,11 +168,9 @@ class TasksManager extends Component
             $this->reset(['taskName', 'editingTaskId']);
         } else {
             // Handle the failure case if needed
-            Log::error("Failed to update task with ID {$this->editingTaskId}");
             session()->flash('error.task', __('tasks.update_failed'));
         }
     }
-    
     /**
      * deleteTask 
      * handle the click event on Delete button.

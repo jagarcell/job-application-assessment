@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Collection;
 use App\Models\Project;
 use App\Models\Task;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class ProjectsAndTasksRepository
 {
@@ -86,7 +88,7 @@ class ProjectsAndTasksRepository
             $task->update($data);
             return true;
         } catch (\Exception $e) {
-            \Log::error("Failed to update task ID {$taskId}: " . $e->getMessage());
+            Log::error("Failed to update task with ID {$taskId}: " . $e->getMessage());
             return false;
         }
     }
@@ -104,7 +106,7 @@ class ProjectsAndTasksRepository
             // Additional logic can be added here if needed
             return Task::create($data);
         } catch (\Exception $e) {
-            \Log::error("Failed to create task: " . $e->getMessage());
+            Log::error("Failed to create task {$data['name']} in project ID {$data['project_id']}" . $e->getMessage());
             return null;
         }
     }
@@ -122,7 +124,7 @@ class ProjectsAndTasksRepository
             $task = Task::findOrFail($taskId);
             return $task->name;
         } catch (\Exception $e) {
-            Log::error("Failed to edit task ID {$taskId}: " . $e->getMessage());
+            Log::error("Failed to edit task with ID {$taskId}: " . $e->getMessage());
             return '';
         }
     }
@@ -161,7 +163,7 @@ class ProjectsAndTasksRepository
 
             // We could have done something like this with Eloquent, but it would be less efficient leading to N + 1 queries:
 
-            //  $tasksToReorder = Task::where('project_id', $this->selectedProject)
+            //  $tasksToReorder = Task::where('project_id', $projectId)
             //              ->orderBy('priority')
             //              ->get();
 
@@ -170,7 +172,7 @@ class ProjectsAndTasksRepository
             // }
             return true;
         } catch (\Exception $e) {
-            \Log::error("Failed to reorder tasks in project ID {$projectId}: " . $e->getMessage());
+            Log::error("Failed to reorder tasks in project ID {$projectId}: " . $e->getMessage());
             return false;
         }
     }
@@ -180,33 +182,36 @@ class ProjectsAndTasksRepository
      * @param string $orderedTaskIdsStr
      * @return void
      */
-    public function setNewTaksOrder(string $orderedTaskIds): void
+    public function setNewTaksOrder(string $orderedTaskIdsStr): void
     {
         if (empty($orderedTaskIdsStr)) {
             return;
         }
-        // Let's convert the string back to an array for easier processing
-        $orderedTaskIds = explode(',', $orderedTaskIdsStr);
+        try {
+            // Let's convert the string back to an array for easier processing
+            $orderedTaskIds = explode(',', $orderedTaskIdsStr);
 
-        // We use a raw query to update the priorities in a single query for efficiency
-        // Instead of looping through each task and updating them one by one using Eloquent.
+            // We use a raw query to update the priorities in a single query for efficiency
+            // Instead of looping through each task and updating them one by one using Eloquent.
 
-        // Build the CASE SQL query to update priorities in a single query
-        $setPrioritiesSqlQuery = "CASE id ";
-        foreach ($orderedTaskIds as $index => $taskId) {
-            $priority = $index + 1;
-            $setPrioritiesSqlQuery .= "WHEN {$taskId} THEN {$priority} ";
+            // Build the CASE SQL query to update priorities in a single query
+            $setPrioritiesSqlQuery = "CASE id ";
+            foreach ($orderedTaskIds as $index => $taskId) {
+                $priority = $index + 1;
+                $setPrioritiesSqlQuery .= "WHEN {$taskId} THEN {$priority} ";
+            }
+            $setPrioritiesSqlQuery .= "END";
+            $ids = implode(',', $orderedTaskIds);
+            // Execute the update query to reorder tasks
+            DB::statement("UPDATE tasks SET priority = {$setPrioritiesSqlQuery}, updated_at = ? WHERE id IN ({$ids})", [Carbon::now()]);
+
+            // We could have done something like this with Eloquent, but it would be less efficient leading to N queries iunstead of just one:
+
+            // foreach ($orderedTaskIds as $index => $taskId) {
+            //     Task::where('id', $taskId)->update(['priority' => $index + 1]);
+            // }
+        } catch (\Exception $e) {
+            Log::error("Failed to set new task order: " . $e->getMessage());
         }
-        $setPrioritiesSqlQuery .= "END";
-        $ids = implode(',', $orderedTaskIds);
-        // Execute the update query to reorder tasks
-        DB::statement("UPDATE tasks SET priority = {$setPrioritiesSqlQuery}, updated_at = NOW() WHERE id IN ({$ids})");
-
-        // We could have done something like this with Eloquent, but it would be less efficient leading to N queries iunstead of just one:
-
-        // foreach ($orderedTaskIds as $index => $taskId) {
-        //     Task::where('id', $taskId)->update(['priority' => $index + 1]);
-        // }
-
     }
 }
