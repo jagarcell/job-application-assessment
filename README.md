@@ -4,6 +4,7 @@ This is a simple demo of a Project Task Manager, built with PHP (Laravel) for th
 This project include Unit Testing for both Backend functionality and Frontend Livewire functionality.
 
 # Initial Setup
+Use the green Code button at the top to select the Download Zip option. 
 
 Unzip the downloaded file.
 
