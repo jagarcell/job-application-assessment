@@ -1,6 +1,7 @@
 # Task Manager Demo App
 
 This is a simple demo of a Project Task Manager, built with PHP (Laravel) for the backend and Livewire for the frontend.
+
 This project include Unit Testing for both Backend functionality and Frontend Livewire functionality.
 
 # Initial Setup
